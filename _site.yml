@@ -9,4 +9,6 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
+    - icon: fab fa-github
+      href: https://aaronpeikert.github.io/se-viz/
 output: radix::radix_article
