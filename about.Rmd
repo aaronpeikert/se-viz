@@ -8,3 +8,4 @@ description: |
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+You can find the source code on [github.com/aaronpeikert/se-viz](https://github.com/aaronpeikert/se-viz).
