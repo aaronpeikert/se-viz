@@ -8,4 +8,4 @@ description: |
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-You can find the source code on [github.com/aaronpeikert/se-viz](https://github.com/aaronpeikert/se-viz).
+This website contains my rough notes and results of experiments in this seminar. You can find the source code on [github.com/aaronpeikert/se-viz](https://github.com/aaronpeikert/se-viz).
