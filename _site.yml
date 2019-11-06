@@ -1,0 +1,12 @@
+name: "se-viz"
+title: "Seminar Data Visualization"
+description: |
+  Seminar Data Visualization
+output_dir: "docs"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+output: radix::radix_article
