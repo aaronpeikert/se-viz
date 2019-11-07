@@ -5,7 +5,10 @@ description: |
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      layout="l-body-outset",
+                      dpi=300)
 if(!require("pacman"))install.packages("pacman")
 pacman::p_load("tidyverse", "ggthemes")
 ```
@@ -116,7 +119,7 @@ p <- p +
 plot(p)
 ```
 
-Personally I all ready like this graph but one may replace the backround grid by axis ticks.
+Personally I all ready like this graph but lets get more tufteesque. Tufte would probably replace the backround grid by axis ticks.
 
 ```{r}
 p <- p + 
@@ -134,7 +137,7 @@ p <- p +
 plot(p)
 ```
 
-Now we can mute the colours a bit.
+I am unsure which colors tufte might use but probably something more muted.
 
 ```{r}
 avg_color <- function(hexs){
@@ -149,6 +152,20 @@ p <- p +
         text = element_text(colour = avg_traffic)) + 
   scale_colour_tableau("Traffic") +
   NULL
+plot(p)
+```
+
+Tufte dislikes displays, so he often presents digital representation with a "non-white" backround that resembles paper.
+
+```{r}
+p <- p + theme(plot.background = element_rect(fill = "#FFFAF5"),
+          plot.margin = unit(c(1,1,1,1), "cm"))
+plot(p)
+```
+
+# Result
+
+```{r, echo=FALSE, layout="l-screen-inset"}
 plot(p)
 ```
 
