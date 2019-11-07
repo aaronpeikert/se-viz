@@ -1304,7 +1304,7 @@
 
 <div class="d-article">
 <h1 id="data">Data</h1>
-<p>Just renaming, to fit my personal preferences.</p>
+<p>Just renaming variables, to fit my personal preferences.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 data(iris)
@@ -1321,41 +1321,39 @@ ggplot(iris, aes(sepal_length, petal_length)) + geom_point()</code></pre>
 <p>Clearly we should code the species.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+p &lt;- ggplot(iris, aes(sepal_length, petal_length, color = species)) +
   geom_point() +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
 </div>
 <p>I just cannot stand the standard grey backround.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
+p &lt;- p +
   theme_minimal() +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-4-1.png" width="624" /></p>
 </div>
 <p>Both axes are on the same scale, we could reflect that.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
+p &lt;- p + 
   coord_fixed() +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
 </div>
 <p>The breaks are not symetrical.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 round_breaks &lt;- function(lim)ceiling(seq(lim[[1]], lim[[2]], by = 1))
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
+p &lt;- p +
   scale_x_continuous(breaks = round_breaks) +
   scale_y_continuous(breaks = round_breaks) +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-6-1.png" width="624" /></p>
 </div>
 <p>The legend does need a lot of space.</p>
@@ -1366,12 +1364,7 @@ iris_cluster &lt;- iris %&gt;%
   summarise(sepal_length = mean(sepal_length),
             petal_length = mean(petal_length))
 
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
-  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
-  scale_y_continuous(breaks = round_breaks) +
+p &lt;- p + 
   geom_text(data = iris_cluster,
             mapping = aes(sepal_length,
                           petal_length,
@@ -1380,81 +1373,43 @@ ggplot(iris, aes(sepal_length, petal_length, color = species)) +
             nudge_x = 1.5,
             inherit.aes = FALSE) +
   theme(legend.position = &quot;none&quot;) +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-7-1.png" width="624" /></p>
 </div>
 <p>Adding a marginal distribution comes essentially for free.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
-  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
-  scale_y_continuous(breaks = round_breaks) +
-  geom_text(data = iris_cluster,
-            mapping = aes(sepal_length,
-                          petal_length,
-                          label = species,
-                          color = species),
-            nudge_x = 1.5,
-            inherit.aes = FALSE) +
-  theme(legend.position = &quot;none&quot;) +
-  xlab(&quot;Sepal lenght (cm)&quot;) + 
-  ylab(&quot;Petal lenght (cm)&quot;) + 
+p &lt;- p +
   geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
   geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
 </div>
 <p>We gain a lot of space by flipping the plot.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
-  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
-  scale_y_continuous(breaks = round_breaks) +
-  geom_text(data = iris_cluster,
-            mapping = aes(sepal_length,
-                          petal_length,
-                          label = species,
-                          color = species),
-            nudge_x = 1.5,
-            inherit.aes = FALSE) +
-  theme(legend.position = &quot;none&quot;) +
-  xlab(&quot;Sepal lenght (cm)&quot;) + 
-  ylab(&quot;Petal lenght (cm)&quot;) + 
-  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
-  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
+p &lt;- p +
   coord_flip() +
-  NULL</code></pre>
+  NULL
+plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
+</div>
+<p>Ok, proper labels are neccesary.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+p &lt;- p +
+  xlab(&quot;Sepal lenght (cm)&quot;) + 
+  ylab(&quot;Petal lenght (cm)&quot;) +
+  NULL
+plot(p)</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-10-1.png" width="624" /></p>
 </div>
 <p>Personally I all ready like this graph but one may replace the backround grid by axis ticks.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
-  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
-  scale_y_continuous(breaks = round_breaks) +
-  geom_text(data = iris_cluster,
-            mapping = aes(sepal_length,
-                          petal_length,
-                          label = species,
-                          color = species),
-            nudge_x = 1.5,
-            inherit.aes = FALSE) +
-  theme(legend.position = &quot;none&quot;) +
-  xlab(&quot;Sepal lenght (cm)&quot;) + 
-  ylab(&quot;Petal lenght (cm)&quot;) + 
-  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
-  geom_jitter(aes(x = sepal_length, y = 0),
-              height = 0, shape = 96, size = 4, alpha = .5) +
-  coord_flip() +
+p &lt;- p + 
   theme_void() +
   theme(axis.ticks = element_line(),
         axis.ticks.length = unit(0.05, &quot;cm&quot;), 
@@ -1465,46 +1420,20 @@ ggplot(iris, aes(sepal_length, petal_length, color = species)) +
         axis.title = element_text(),
         axis.title.y = element_text(angle = 90, margin = margin(r = 5)),
         axis.title.x = element_text(angle = 0, margin = margin(t = 5)),) + 
-  NULL</code></pre>
-<p><img src="01strip_files/figure-html5/unnamed-chunk-10-1.png" width="624" /></p>
+  NULL
+plot(p)</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
 </div>
 <p>Now we can mute the colours a bit.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-ggplot(iris, aes(sepal_length, petal_length, color = species)) +
-  geom_point() +
-  theme_minimal() +
-  coord_fixed() +
-  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
-  scale_y_continuous(breaks = round_breaks) +
-  geom_text(data = iris_cluster,
-            mapping = aes(sepal_length,
-                          petal_length,
-                          label = species,
-                          color = species),
-            nudge_x = 1.5,
-            inherit.aes = FALSE) +
-  theme(legend.position = &quot;none&quot;) +
-  xlab(&quot;Sepal lenght (cm)&quot;) + 
-  ylab(&quot;Petal lenght (cm)&quot;) + 
-  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
-  geom_jitter(aes(x = sepal_length, y = 0),
-              height = 0, shape = 96, size = 4, alpha = .5) +
-  coord_flip() +
-  theme_void() +
+p &lt;- p +
   theme(axis.ticks = element_line(colour = &quot;#E0C89D&quot;),
-        axis.ticks.length = unit(0.05, &quot;cm&quot;), 
-        axis.text = element_text(size = rel(0.8)),
-        legend.position = &quot;none&quot;,
-        axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
-        axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
-        axis.title = element_text(),
-        axis.title.y = element_text(angle = 90, margin = margin(r = 5)),
-        axis.title.x = element_text(angle = 0, margin = margin(t = 5)),
         text = element_text(colour = &quot;#E0C89D&quot;)) + 
   scale_color_manual(values = c(&quot;#F5BB5C&quot;, &quot;#D96725&quot;, &quot;#731702&quot;)) +
-  NULL</code></pre>
-<p><img src="01strip_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
+  NULL
+plot(p)</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-12-1.png" width="624" /></p>
 </div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
