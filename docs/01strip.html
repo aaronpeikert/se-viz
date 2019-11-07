@@ -19,29 +19,29 @@
  <!--/radix_placeholder_import_source-->
 
   <!--radix_placeholder_meta_tags-->
-  <title>Seminar Data Visualization</title>
+  <title>Seminar Data Visualization: Strip</title>
   
-  <meta property="description" itemprop="description" content="This website contains my rough notes and results of experiments in this seminar."/>
+  <meta property="description" itemprop="description" content="What makes a good graph? One feature is certainly the efficient communication of information."/>
   
   
   
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Seminar Data Visualization"/>
+  <meta property="og:title" content="Seminar Data Visualization: Strip"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="This website contains my rough notes and results of experiments in this seminar."/>
+  <meta property="og:description" content="What makes a good graph? One feature is certainly the efficient communication of information."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Seminar Data Visualization"/>
   
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Seminar Data Visualization"/>
-  <meta property="twitter:description" content="This website contains my rough notes and results of experiments in this seminar."/>
+  <meta property="twitter:title" content="Seminar Data Visualization: Strip"/>
+  <meta property="twitter:description" content="What makes a good graph? One feature is certainly the efficient communication of information."/>
   
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","site"]}},"value":[{"type":"character","attributes":{},"value":["Seminar Data Visualization"]},{"type":"character","attributes":{},"value":["This website contains my rough notes and results of experiments in this seminar.\n"]},{"type":"character","attributes":{},"value":["radix::radix_website"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description"]}},"value":[{"type":"character","attributes":{},"value":["Strip"]},{"type":"character","attributes":{},"value":["What makes a good graph? One feature is certainly the efficient communication of information."]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -1272,7 +1272,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Seminar Data Visualization","description":"This website contains my rough notes and results of experiments in this seminar.","authors":[]}
+{"title":"Strip","description":"What makes a good graph? One feature is certainly the efficient communication of information.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1297,13 +1297,215 @@
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Seminar Data Visualization</h1>
-<p>This website contains my rough notes and results of experiments in this seminar.</p>
+<h1>Strip</h1>
+<p>What makes a good graph? One feature is certainly the efficient communication of information.</p>
 </div>
 
 
 <div class="d-article">
-<p>You can find the source code on <a href="https://github.com/aaronpeikert/se-viz">github.com/aaronpeikert/se-viz</a>.</p>
+<h1 id="data">Data</h1>
+<p>Just renaming, to fit my personal preferences.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+data(iris)
+iris &lt;- rename_all(iris, tolower) %&gt;%
+  rename_all(~str_replace(., fixed(&quot;.&quot;), &quot;_&quot;))</code></pre>
+</div>
+<h1 id="plots">Plots</h1>
+<p>This is our basic plot we want to improve.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length)) + geom_point()</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-2-1.png" width="624" /></p>
+</div>
+<p>Clearly we should code the species.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
+</div>
+<p>I just cannot stand the standard grey backround.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-4-1.png" width="624" /></p>
+</div>
+<p>Both axes are on the same scale, we could reflect that.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
+</div>
+<p>The breaks are not symetrical.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+round_breaks &lt;- function(lim)ceiling(seq(lim[[1]], lim[[2]], by = 1))
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks) +
+  scale_y_continuous(breaks = round_breaks) +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-6-1.png" width="624" /></p>
+</div>
+<p>The legend does need a lot of space.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+iris_cluster &lt;- iris %&gt;%
+  group_by(species) %&gt;%
+  summarise(sepal_length = mean(sepal_length),
+            petal_length = mean(petal_length))
+
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
+  scale_y_continuous(breaks = round_breaks) +
+  geom_text(data = iris_cluster,
+            mapping = aes(sepal_length,
+                          petal_length,
+                          label = species,
+                          color = species),
+            nudge_x = 1.5,
+            inherit.aes = FALSE) +
+  theme(legend.position = &quot;none&quot;) +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-7-1.png" width="624" /></p>
+</div>
+<p>Adding a marginal distribution comes essentially for free.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
+  scale_y_continuous(breaks = round_breaks) +
+  geom_text(data = iris_cluster,
+            mapping = aes(sepal_length,
+                          petal_length,
+                          label = species,
+                          color = species),
+            nudge_x = 1.5,
+            inherit.aes = FALSE) +
+  theme(legend.position = &quot;none&quot;) +
+  xlab(&quot;Sepal lenght (cm)&quot;) + 
+  ylab(&quot;Petal lenght (cm)&quot;) + 
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
+</div>
+<p>We gain a lot of space by flipping the plot.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
+  scale_y_continuous(breaks = round_breaks) +
+  geom_text(data = iris_cluster,
+            mapping = aes(sepal_length,
+                          petal_length,
+                          label = species,
+                          color = species),
+            nudge_x = 1.5,
+            inherit.aes = FALSE) +
+  theme(legend.position = &quot;none&quot;) +
+  xlab(&quot;Sepal lenght (cm)&quot;) + 
+  ylab(&quot;Petal lenght (cm)&quot;) + 
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
+  coord_flip() +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
+</div>
+<p>Personally I all ready like this graph but one may replace the backround grid by axis ticks.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
+  scale_y_continuous(breaks = round_breaks) +
+  geom_text(data = iris_cluster,
+            mapping = aes(sepal_length,
+                          petal_length,
+                          label = species,
+                          color = species),
+            nudge_x = 1.5,
+            inherit.aes = FALSE) +
+  theme(legend.position = &quot;none&quot;) +
+  xlab(&quot;Sepal lenght (cm)&quot;) + 
+  ylab(&quot;Petal lenght (cm)&quot;) + 
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0),
+              height = 0, shape = 96, size = 4, alpha = .5) +
+  coord_flip() +
+  theme_void() +
+  theme(axis.ticks = element_line(),
+        axis.ticks.length = unit(0.05, &quot;cm&quot;), 
+        axis.text = element_text(size = rel(0.8)),
+        legend.position = &quot;none&quot;,
+        axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
+        axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
+        axis.title = element_text(),
+        axis.title.y = element_text(angle = 90, margin = margin(r = 5)),
+        axis.title.x = element_text(angle = 0, margin = margin(t = 5)),) + 
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-10-1.png" width="624" /></p>
+</div>
+<p>Now we can mute the colours a bit.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  coord_fixed() +
+  scale_x_continuous(breaks = round_breaks, limits = c(4, 9)) +
+  scale_y_continuous(breaks = round_breaks) +
+  geom_text(data = iris_cluster,
+            mapping = aes(sepal_length,
+                          petal_length,
+                          label = species,
+                          color = species),
+            nudge_x = 1.5,
+            inherit.aes = FALSE) +
+  theme(legend.position = &quot;none&quot;) +
+  xlab(&quot;Sepal lenght (cm)&quot;) + 
+  ylab(&quot;Petal lenght (cm)&quot;) + 
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0),
+              height = 0, shape = 96, size = 4, alpha = .5) +
+  coord_flip() +
+  theme_void() +
+  theme(axis.ticks = element_line(colour = &quot;#E0C89D&quot;),
+        axis.ticks.length = unit(0.05, &quot;cm&quot;), 
+        axis.text = element_text(size = rel(0.8)),
+        legend.position = &quot;none&quot;,
+        axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
+        axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
+        axis.title = element_text(),
+        axis.title.y = element_text(angle = 90, margin = margin(r = 5)),
+        axis.title.x = element_text(angle = 0, margin = margin(t = 5)),
+        text = element_text(colour = &quot;#E0C89D&quot;)) + 
+  scale_color_manual(values = c(&quot;#F5BB5C&quot;, &quot;#D96725&quot;, &quot;#731702&quot;)) +
+  NULL</code></pre>
+<p><img src="01strip_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
+</div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

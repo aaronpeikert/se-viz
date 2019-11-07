@@ -4,6 +4,9 @@ description: |
   Seminar Data Visualization
 output_dir: "docs"
 navbar:
+  left:
+    - text: "Strip"
+      href: 01strip.html
   right:
     - text: "About"
       href: about.html
