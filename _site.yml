@@ -11,5 +11,5 @@ navbar:
     - text: "About"
       href: about.html
     - icon: fab fa-github
-      href: https://aaronpeikert.github.io/se-viz/
+      href: https://github.com/aaronpeikert/se-viz
 output: radix::radix_article
