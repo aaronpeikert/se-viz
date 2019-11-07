@@ -7,7 +7,7 @@ description: |
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 if(!require("pacman"))install.packages("pacman")
-pacman::p_load("tidyverse", "ggthemr")
+pacman::p_load("tidyverse", "ggthemes")
 ```
 
 # Data
@@ -91,8 +91,8 @@ Adding a marginal distribution comes essentially for free.
 
 ```{r}
 p <- p +
-  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
-  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 10, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 10, alpha = .5) +
   NULL
 plot(p)
 ```
@@ -137,10 +137,17 @@ plot(p)
 Now we can mute the colours a bit.
 
 ```{r}
+avg_color <- function(hexs){
+  rgbs <- map(hexs, col2rgb)
+  rescaled <- do.call(cbind, rgbs)/255
+  avg <- rowMeans(rescaled)
+  do.call(rgb, as.list(avg))
+}
+avg_traffic <- avg_color(tableau_color_pal("Traffic")(3))
 p <- p +
-  theme(axis.ticks = element_line(colour = "#E0C89D"),
-        text = element_text(colour = "#E0C89D")) + 
-  scale_color_manual(values = c("#F5BB5C", "#D96725", "#731702")) +
+  theme(axis.ticks = element_line(colour = avg_traffic),
+        text = element_text(colour = avg_traffic)) + 
+  scale_colour_tableau("Traffic") +
   NULL
 plot(p)
 ```

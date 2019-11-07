@@ -1381,8 +1381,8 @@ plot(p)</code></pre>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 p &lt;- p +
-  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 4, alpha = .5) +
-  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 4, alpha = .5) +
+  geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 10, alpha = .5) +
+  geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 10, alpha = .5) +
   NULL
 plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
@@ -1427,10 +1427,17 @@ plot(p)</code></pre>
 <p>Now we can mute the colours a bit.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
+avg_color &lt;- function(hexs){
+  rgbs &lt;- map(hexs, col2rgb)
+  rescaled &lt;- do.call(cbind, rgbs)/255
+  avg &lt;- rowMeans(rescaled)
+  do.call(rgb, as.list(avg))
+}
+avg_traffic &lt;- avg_color(tableau_color_pal(&quot;Traffic&quot;)(3))
 p &lt;- p +
-  theme(axis.ticks = element_line(colour = &quot;#E0C89D&quot;),
-        text = element_text(colour = &quot;#E0C89D&quot;)) + 
-  scale_color_manual(values = c(&quot;#F5BB5C&quot;, &quot;#D96725&quot;, &quot;#731702&quot;)) +
+  theme(axis.ticks = element_line(colour = avg_traffic),
+        text = element_text(colour = avg_traffic)) + 
+  scale_colour_tableau(&quot;Traffic&quot;) +
   NULL
 plot(p)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-12-1.png" width="624" /></p>
