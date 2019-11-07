@@ -1,7 +1,7 @@
 ---
 title: "Strip"
 description: |
-  What makes a good graph? One feature is certainly the efficient communication of information.
+  What makes a good graph? One feature is certainly the efficient communication of information. In this lecture we try to apply Tufte's idea of 'data-ink-ratio'.
 ---
 
 ```{r setup, include=FALSE}
@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE,
 if(!require("pacman"))install.packages("pacman")
 pacman::p_load("tidyverse", "ggthemes")
 ```
+
+*Note: This is in large parts just a recreation of the examples given by Martin Rolfs in Matlab.*
 
 # Data
 
