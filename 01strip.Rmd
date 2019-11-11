@@ -13,7 +13,7 @@ if(!require("pacman"))install.packages("pacman")
 pacman::p_load("tidyverse", "ggthemes")
 ```
 
-*Note: This is in large parts just a recreation of the examples given by Martin Rolfs in Matlab.*
+*Note: This first part is in large parts just a recreation of the examples given by Martin Rolfs in Matlab.*
 
 # Data
 
@@ -25,50 +25,51 @@ iris <- rename_all(iris, tolower) %>%
   rename_all(~str_replace(., fixed("."), "_"))
 ```
 
-# Plots
+# Scatter Plot
 
 This is our basic plot we want to improve.
 
 ```{r}
-ggplot(iris, aes(sepal_length, petal_length)) + geom_point()
+scatter_orginal <- ggplot(iris, aes(sepal_length, petal_length)) + geom_point()
+plot(scatter_orginal)
 ```
 
 Clearly we should code the species.
 
 ```{r}
-p <- ggplot(iris, aes(sepal_length, petal_length, color = species)) +
+scatter <- ggplot(iris, aes(sepal_length, petal_length, color = species)) +
   geom_point() +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 I just cannot stand the standard grey backround.
 
 ```{r}
-p <- p +
+scatter <- scatter +
   theme_minimal() +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 Both axes are on the same scale, we could reflect that.
 
 ```{r}
-p <- p + 
+scatter <- scatter + 
   coord_fixed() +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 The breaks are not symetrical.
 
 ```{r}
 round_breaks <- function(lim)ceiling(seq(lim[[1]], lim[[2]], by = 1))
-p <- p +
+scatter <- scatter +
   scale_x_continuous(breaks = round_breaks) +
   scale_y_continuous(breaks = round_breaks) +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 The legend does need a lot of space.
@@ -79,7 +80,7 @@ iris_cluster <- iris %>%
   summarise(sepal_length = mean(sepal_length),
             petal_length = mean(petal_length))
 
-p <- p + 
+scatter <- scatter + 
   geom_text(data = iris_cluster,
             mapping = aes(sepal_length,
                           petal_length,
@@ -89,42 +90,42 @@ p <- p +
             inherit.aes = FALSE) +
   theme(legend.position = "none") +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 Adding a marginal distribution comes essentially for free.
 
 ```{r}
-p <- p +
+scatter <- scatter +
   geom_jitter(aes(x = 4, y = petal_length), width = 0, shape = 96, size = 10, alpha = .5) +
   geom_jitter(aes(x = sepal_length, y = 0), height = 0, shape = 96, size = 10, alpha = .5) +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 We gain a lot of space by flipping the plot.
 
 ```{r}
-p <- p +
+scatter <- scatter +
   coord_flip() +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 Ok, proper labels are neccesary.
 
 ```{r}
-p <- p +
+scatter <- scatter +
   xlab("Sepal lenght (cm)") + 
   ylab("Petal lenght (cm)") +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 Personally I all ready like this graph but lets get more tufteesque. Tufte would probably replace the backround grid by axis ticks.
 
 ```{r}
-p <- p + 
+scatter <- scatter + 
   theme_void() +
   theme(axis.ticks = element_line(),
         axis.ticks.length = unit(0.05, "cm"), 
@@ -136,7 +137,7 @@ p <- p +
         axis.title.y = element_text(angle = 90, margin = margin(r = 5)),
         axis.title.x = element_text(angle = 0, margin = margin(t = 5)),) + 
   NULL
-plot(p)
+plot(scatter)
 ```
 
 I am unsure which colors tufte might use but probably something more muted.
@@ -149,25 +150,190 @@ avg_color <- function(hexs){
   do.call(rgb, as.list(avg))
 }
 avg_traffic <- avg_color(tableau_color_pal("Traffic")(3))
-p <- p +
+scatter <- scatter +
   theme(axis.ticks = element_line(colour = avg_traffic),
         text = element_text(colour = avg_traffic)) + 
   scale_colour_tableau("Traffic") +
   NULL
-plot(p)
+plot(scatter)
 ```
 
 Tufte dislikes displays, so he often presents digital representation with a "non-white" backround that resembles paper.
 
 ```{r}
-p <- p + theme(plot.background = element_rect(fill = "#FFFAF5"),
-          plot.margin = unit(c(1,1,1,1), "cm"))
-plot(p)
+scatter <- scatter +
+  theme(plot.background = element_rect(fill = "#FFFAF5"),
+        plot.margin = unit(c(1,1,1,1), "cm"))
+plot(scatter)
 ```
 
-# Result
+## Result
 
 ```{r, echo=FALSE, layout="l-screen-inset"}
-plot(p)
+plot(scatter_orginal)
+plot(scatter)
 ```
 
+# Boxplot
+
+```{r}
+iris_wide <- iris %>%
+  pivot_longer(c(sepal_length,
+                                petal_length,
+                                sepal_width,
+                                petal_width),
+                              names_to = "measure",
+                              values_to = "cm")
+box <- ggplot(iris_wide, aes(measure, cm, color = species)) +
+  geom_boxplot() +
+  NULL
+plot(box)
+```
+
+There are multiple critics --- one of them tufte --- of the boxplot, the main argument is that it hides the raw data. So I revert to simple points, since it is a small dataset.
+
+```{r}
+point <- ggplot(iris_wide, aes(measure, cm, color = species, group = species)) +
+  geom_point() +
+  NULL
+plot(point)
+```
+
+Okay the overlap between the groups hides much information.
+
+```{r}
+point <- ggplot(iris_wide, aes(measure, cm, color = species, group = species)) +
+  geom_point(position = position_dodge(width = 1)) +
+  NULL
+plot(point)
+```
+
+Still a lot of overplotting, so I arrange them ordered by their average size, measured as the mean of z-values on all four variables per species.
+
+```{r}
+iris_wide <- iris %>%
+    group_by(species) %>%
+  mutate(mean_size = rowMeans(cbind(scale(petal_length),
+                                    scale(petal_width),
+                                    scale(sepal_length),
+                                    scale(sepal_width)))) %>% 
+  arrange(mean_size) %>% 
+  rownames_to_column("id") %>% 
+  pivot_longer(c(sepal_length,
+                                petal_length,
+                                sepal_width,
+                                petal_width),
+                              names_to = "measure",
+                              values_to = "cm") %>% 
+  ungroup() %>% 
+  mutate(id = factor(as.numeric(id)))
+point <- ggplot(iris_wide, aes(measure, cm, color = species, group = species)) +
+  geom_point(position = position_jitterdodge(jitter.height = 0, seed = 1234)) +
+  labs(caption = "Points are ordered according to average ranked size.") +
+  NULL
+plot(point)
+```
+
+Again, replace the backround.
+
+```{r}
+point <- point +
+  theme_minimal() +
+  NULL
+plot(point)
+```
+
+I think this plot mixes two dimensions on the x-axes, length vs. width and sepal vs. petal.
+
+```{r}
+iris_wide2 <- iris_wide %>%
+  separate(measure, c("leaf", "measure"), sep = "_")
+point <- ggplot(iris_wide2, aes(species, cm, color = species, group = id)) +
+  geom_point(position = position_dodge(width = .8), alpha = .7, size = .7) +
+  facet_grid(measure~leaf) +
+  theme_minimal() +
+  NULL
+plot(point)
+```
+
+While the ordering provides interesting information, it makes it a bit harder to judge the distribution, so I add a minimal boxplot.
+
+```{r}
+boxplot_stats <- function(x, coef = 1.5){
+  raw <- boxplot.stats(x, coef)
+  tibble(whisker_position = factor(c("upper", "upper", "lower", "lower")),
+         whisker = c(raw$stats[-3]),
+         median = raw$stats[3])
+}
+iris_summary <- iris_wide2 %>%
+  group_by(species, leaf, measure) %>%
+  summarise(boxplot = list(boxplot_stats(cm))) %>% 
+  unnest(boxplot) %>% 
+  unite("whisker_position", species, whisker_position, remove = FALSE)
+point <- point +
+  geom_point(aes(species, median, color = species),
+                   data = iris_summary,
+                   position = position_nudge(x = .5),
+             size = .7,
+                   inherit.aes = FALSE) +
+  geom_line(aes(species, whisker, group = whisker_position, color = species),
+                   data = iris_summary,
+                   position = position_nudge(x = .5),
+                   inherit.aes = FALSE) +
+  labs(caption = "Points are ordered along x-axes according to average ranked size.") +
+  theme(plot.caption = element_text(margin = unit(c(.5, 0, 0, 0), "cm"))) +
+  NULL
+plot(point)
+```
+
+I think the boxplots seperate the species clearly enough, so that the legend may be remved.
+
+```{r}
+point <- point + 
+  theme(legend.position = "none",
+        axis.title.x = element_blank())
+plot(point)
+```
+
+Maybe we can remove the grid:
+
+```{r}
+point <- point +
+theme_void() +
+  theme(axis.ticks = element_line(),
+        axis.ticks.length = unit(0.05, "cm"), 
+        axis.text = element_text(size = rel(0.8)),
+        legend.position = "none",
+        axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
+        axis.text.y = element_text(margin = margin(r = 5), hjust = 0)) + 
+  NULL
+plot(point)
+```
+
+I liked the color scheme for the scatter plot.
+
+```{r}
+point <- point + geom_vline(aes(xintercept = x),
+                            tibble(leaf = "petal", x = Inf),
+                            col = avg_traffic,
+                            alpha = .2) +
+  geom_hline(aes(yintercept = x),
+             tibble(measure = c("length"), x = 0L),
+             col = avg_traffic,
+             alpha = .2) +
+  scale_colour_tableau("Traffic") +
+  theme(axis.ticks = element_line(colour = avg_traffic),
+        text = element_text(colour = avg_traffic),
+        plot.background = element_rect(fill = "#FFFAF5"),
+        panel.spacing = unit(0, "cm"),
+        plot.margin = unit(c(1, 1, 1, 1), "cm")) +
+  NULL
+plot(point)
+```
+
+## Result
+
+```{r, echo=FALSE, layout="l-screen-inset"}
+plot(box)
+plot(point)
+```
