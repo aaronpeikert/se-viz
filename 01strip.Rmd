@@ -342,4 +342,18 @@ plot(box)
 plot(point)
 ```
 
-
+```{r, include=FALSE, eval=FALSE}
+dir.create(here("output"), showWarnings = FALSE)
+ggsave(here("output", "box_plot_orginal.pdf"),
+       box,
+       height = 3,
+       width = 4,
+       units = "cm",
+       scale = 5)
+ggsave(here("output", "point_plot_altered.pdf"),
+       point,
+       height = 3,
+       width = 4,
+       units = "cm",
+       scale = 5)
+```
