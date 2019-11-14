@@ -1588,6 +1588,7 @@ theme_void() +
   theme(axis.ticks = element_line(),
         axis.ticks.length = unit(0.05, &quot;cm&quot;), 
         axis.text = element_text(size = rel(0.8)),
+        axis.title.y = element_text(vjust = 0, hjust = 0.5),
         legend.position = &quot;none&quot;,
         axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
         axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
@@ -1611,6 +1612,7 @@ point &lt;- point + geom_vline(aes(xintercept = x),
   scale_colour_tableau(&quot;Traffic&quot;) +
   theme(axis.ticks = element_line(colour = avg_traffic),
         text = element_text(colour = avg_traffic),
+        axis.title.y = element_text(colour = avg_traffic, vjust = 0.5, hjust = 0.5),
         plot.background = element_rect(fill = &quot;#FFFAF5&quot;),
         panel.spacing = unit(0, &quot;cm&quot;),
         plot.margin = unit(c(1, 1, 1, 1), &quot;cm&quot;)) +
