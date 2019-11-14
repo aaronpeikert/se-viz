@@ -1350,7 +1350,7 @@ plot(scatter)</code></pre>
 <p>The breaks are not symetrical.</p>
 <div class="layout-chunk" data-layout="l-body-outset">
 <pre class="r"><code>
-round_breaks &lt;- function(lim)ceiling(seq(lim[[1]], lim[[2]], by = 1))
+round_breaks &lt;- function(lim, by = 1)ceiling(seq(lim[[1]], lim[[2]], by = by))
 scatter &lt;- scatter +
   scale_x_continuous(breaks = round_breaks) +
   scale_y_continuous(breaks = round_breaks) +
@@ -1512,7 +1512,7 @@ iris_wide &lt;- iris %&gt;%
   mutate(id = factor(as.numeric(id)))
 point &lt;- ggplot(iris_wide, aes(measure, cm, color = species, group = species)) +
   geom_point(position = position_jitterdodge(jitter.height = 0, seed = 1234)) +
-  labs(caption = &quot;Points are ordered according to average ranked size.&quot;) +
+  labs(caption = &quot;Points are ordered according to average ranked size per species.&quot;) +
   NULL
 plot(point)</code></pre>
 <p><img src="01strip_files/figure-html5/unnamed-chunk-18-1.png" width="1950" /></p>
@@ -1530,10 +1530,12 @@ plot(point)</code></pre>
 <div class="layout-chunk" data-layout="l-body-outset">
 <pre class="r"><code>
 iris_wide2 &lt;- iris_wide %&gt;%
-  separate(measure, c(&quot;leaf&quot;, &quot;measure&quot;), sep = &quot;_&quot;)
+  separate(measure, c(&quot;leaf&quot;, &quot;measure&quot;), sep = &quot;_&quot;) %&gt;% 
+  mutate(measure = factor(measure, levels = c(&quot;width&quot;, &quot;length&quot;)))
 point &lt;- ggplot(iris_wide2, aes(species, cm, color = species, group = id)) +
   geom_point(position = position_dodge(width = .8), alpha = .7, size = .7) +
-  facet_grid(measure~leaf) +
+  facet_grid(measure~leaf, scales = &quot;free_y&quot;, space = &quot;free_y&quot;) +
+  scale_y_continuous(breaks = function(x)round_breaks(x, 2), limits = c(0, NA)) +
   theme_minimal() +
   NULL
 plot(point)</code></pre>
@@ -1563,7 +1565,7 @@ point &lt;- point +
                    data = iris_summary,
                    position = position_nudge(x = .5),
                    inherit.aes = FALSE) +
-  labs(caption = &quot;Points are ordered along x-axes according to average ranked size.&quot;) +
+  labs(caption = &quot;Points are ordered along x-axes according to average ranked size per species.&quot;) +
   theme(plot.caption = element_text(margin = unit(c(.5, 0, 0, 0), &quot;cm&quot;))) +
   NULL
 plot(point)</code></pre>
@@ -1589,6 +1591,7 @@ theme_void() +
         legend.position = &quot;none&quot;,
         axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
         axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
+        strip.text.x = element_text(margin = margin(b = 10)),
         plot.caption = element_text(margin = unit(c(1, 0, 0, 0), &quot;cm&quot;))) + 
   NULL
 plot(point)</code></pre>

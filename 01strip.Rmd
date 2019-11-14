@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       layout="l-body-outset",
                       dpi=300)
 if(!require("pacman"))install.packages("pacman")
-pacman::p_load("tidyverse", "ggthemes")
+pacman::p_load("here", "tidyverse", "ggthemes")
 ```
 
 *Note: This first part is in large parts just a recreation of the examples given by Martin Rolfs in Matlab.*
@@ -64,7 +64,7 @@ plot(scatter)
 The breaks are not symetrical.
 
 ```{r}
-round_breaks <- function(lim)ceiling(seq(lim[[1]], lim[[2]], by = 1))
+round_breaks <- function(lim, by = 1)ceiling(seq(lim[[1]], lim[[2]], by = by))
 scatter <- scatter +
   scale_x_continuous(breaks = round_breaks) +
   scale_y_continuous(breaks = round_breaks) +
@@ -229,7 +229,7 @@ iris_wide <- iris %>%
   mutate(id = factor(as.numeric(id)))
 point <- ggplot(iris_wide, aes(measure, cm, color = species, group = species)) +
   geom_point(position = position_jitterdodge(jitter.height = 0, seed = 1234)) +
-  labs(caption = "Points are ordered according to average ranked size.") +
+  labs(caption = "Points are ordered according to average ranked size per species.") +
   NULL
 plot(point)
 ```
@@ -247,10 +247,12 @@ I think this plot mixes two dimensions on the x-axes, length vs. width and sepal
 
 ```{r}
 iris_wide2 <- iris_wide %>%
-  separate(measure, c("leaf", "measure"), sep = "_")
+  separate(measure, c("leaf", "measure"), sep = "_") %>% 
+  mutate(measure = factor(measure, levels = c("width", "length")))
 point <- ggplot(iris_wide2, aes(species, cm, color = species, group = id)) +
   geom_point(position = position_dodge(width = .8), alpha = .7, size = .7) +
-  facet_grid(measure~leaf) +
+  facet_grid(measure~leaf, scales = "free_y", space = "free_y") +
+  scale_y_continuous(breaks = function(x)round_breaks(x, 2), limits = c(0, NA)) +
   theme_minimal() +
   NULL
 plot(point)
@@ -280,7 +282,7 @@ point <- point +
                    data = iris_summary,
                    position = position_nudge(x = .5),
                    inherit.aes = FALSE) +
-  labs(caption = "Points are ordered along x-axes according to average ranked size.") +
+  labs(caption = "Points are ordered along x-axes according to average ranked size per species.") +
   theme(plot.caption = element_text(margin = unit(c(.5, 0, 0, 0), "cm"))) +
   NULL
 plot(point)
@@ -306,6 +308,7 @@ theme_void() +
         legend.position = "none",
         axis.text.x = element_text(margin = margin(t = 5), vjust = 0),
         axis.text.y = element_text(margin = margin(r = 5), hjust = 0),
+        strip.text.x = element_text(margin = margin(b = 10)),
         plot.caption = element_text(margin = unit(c(1, 0, 0, 0), "cm"))) + 
   NULL
 plot(point)
@@ -338,3 +341,5 @@ plot(point)
 plot(box)
 plot(point)
 ```
+
+
