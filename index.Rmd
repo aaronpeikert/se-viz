@@ -10,3 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 You can find the source code on [github.com/aaronpeikert/se-viz](https://github.com/aaronpeikert/se-viz).
+
+# Data Ink
+
+You find my try to increase the data-ink-ratio [over here](01strip.html)
